@@ -5,11 +5,11 @@ import { AppDataSource } from '../index'
 import { User } from '../entities/User'
 
 const router = Router()
-const userRepository = AppDataSource.getRepository(User)
 
 // Register new user
 router.post('/register', async (req, res) => {
   try {
+    const userRepository = AppDataSource.getRepository(User)
     const { username, password } = req.body
 
     // Check if user already exists
@@ -54,6 +54,7 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    const userRepository = AppDataSource.getRepository(User)
     const { username, password } = req.body
 
     // Find user

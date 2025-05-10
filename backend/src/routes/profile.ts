@@ -1,14 +1,21 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { AppDataSource } from '../index'
 import { User } from '../entities/User'
 import { authenticateToken } from '../middleware/auth'
 
 const router = Router()
-const userRepository = AppDataSource.getRepository(User)
+
+// Define the AuthRequest interface to match middleware/auth.ts
+interface AuthRequest extends Request {
+  user?: {
+    userId: string
+  }
+}
 
 // Get user profile
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    const userRepository = AppDataSource.getRepository(User)
     const userId = req.user?.userId
 
     const user = await userRepository.findOne({

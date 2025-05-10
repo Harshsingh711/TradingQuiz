@@ -37,12 +37,6 @@ export const AppDataSource = new DataSource({
   synchronize: process.env.NODE_ENV === 'development',
 })
 
-// Routes
-app.use('/api/auth', authRoutes)
-app.use('/api/quiz', quizRoutes)
-app.use('/api/leaderboard', leaderboardRoutes)
-app.use('/api/profile', profileRoutes)
-
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack)
@@ -58,6 +52,13 @@ const PORT = process.env.PORT || 3001
 AppDataSource.initialize()
   .then(() => {
     console.log('Database connected successfully')
+    
+    // Register routes after database is initialized
+    app.use('/api/auth', authRoutes)
+    app.use('/api/quiz', quizRoutes)
+    app.use('/api/leaderboard', leaderboardRoutes)
+    app.use('/api/profile', profileRoutes)
+    
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`)
     })

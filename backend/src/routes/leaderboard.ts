@@ -3,11 +3,12 @@ import { AppDataSource } from '../index'
 import { User } from '../entities/User'
 
 const router = Router()
-const userRepository = AppDataSource.getRepository(User)
 
 // Get leaderboard
 router.get('/', async (req, res) => {
   try {
+    const userRepository = AppDataSource.getRepository(User)
+    
     const users = await userRepository
       .createQueryBuilder('user')
       .select(['user.id', 'user.username', 'user.eloScore'])

@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 import { AppDataSource } from '../index'
 import { Chart } from '../entities/Chart'
 import { Quiz } from '../entities/Quiz'
@@ -6,13 +6,19 @@ import { User } from '../entities/User'
 import { authenticateToken } from '../middleware/auth'
 
 const router = Router()
-const chartRepository = AppDataSource.getRepository(Chart)
-const quizRepository = AppDataSource.getRepository(Quiz)
-const userRepository = AppDataSource.getRepository(User)
+
+// Define the AuthRequest interface to match middleware/auth.ts
+interface AuthRequest extends Request {
+  user?: {
+    userId: string
+  }
+}
 
 // Get random chart for quiz
-router.get('/random', authenticateToken, async (req, res) => {
+router.get('/random', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    const chartRepository = AppDataSource.getRepository(Chart)
+    
     const chart = await chartRepository
       .createQueryBuilder('chart')
       .orderBy('RANDOM()')
@@ -35,10 +41,14 @@ router.get('/random', authenticateToken, async (req, res) => {
 })
 
 // Submit quiz prediction
-router.post('/submit', authenticateToken, async (req, res) => {
+router.post('/submit', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    const chartRepository = AppDataSource.getRepository(Chart)
+    const quizRepository = AppDataSource.getRepository(Quiz)
+    const userRepository = AppDataSource.getRepository(User)
+    
     const { chartId, prediction } = req.body
-    const userId = req.user.userId
+    const userId = req.user?.userId
 
     // Get chart and user
     const chart = await chartRepository.findOne({ where: { id: chartId } })
