@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { AuthProvider } from './context/AuthContext'
 import Navigation from './components/Navigation'
+import { CSSProperties } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,13 +17,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const containerStyle: CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: '#f9fafb'
+  }
+
+  const mainStyle: CSSProperties = {
+    maxWidth: '1280px',
+    margin: '0 auto',
+    padding: '1.5rem 1rem'
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50">
+          <div style={containerStyle}>
             <Navigation />
-            <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <main style={mainStyle}>
               {children}
             </main>
           </div>

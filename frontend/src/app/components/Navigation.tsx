@@ -1,17 +1,18 @@
 'use client';
 
 import { useAuth } from '../context/AuthContext';
+import { CSSProperties } from 'react';
 
 export default function Navigation() {
   const { isAuthenticated, user, logout } = useAuth();
-
-  const navStyle = {
+  
+  const navStyle: CSSProperties = {
     backgroundColor: 'white',
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+    borderBottom: '1px solid #e5e7eb',
     padding: '0.5rem 0'
   };
-
-  const containerStyle = {
+  
+  const containerStyle: CSSProperties = {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '0 1rem',
@@ -20,88 +21,88 @@ export default function Navigation() {
     alignItems: 'center',
     height: '4rem'
   };
-
-  const logoStyle = {
+  
+  const logoStyle: CSSProperties = {
     fontSize: '1.25rem',
     fontWeight: 'bold',
     color: '#2563eb',
     textDecoration: 'none'
   };
-
-  const navGroupStyle = {
+  
+  const navLinksStyle: CSSProperties = {
     display: 'flex',
-    alignItems: 'center',
-    gap: '2rem'
+    gap: '1.5rem'
   };
-
-  const linkStyle = {
+  
+  const linkStyle: CSSProperties = {
     color: '#4b5563',
     textDecoration: 'none',
-    fontWeight: '500',
-    padding: '0.25rem 0',
-    borderBottom: '2px solid transparent'
+    fontWeight: '500'
   };
-
-  const activeStyle = {
+  
+  const activeLinkStyle: CSSProperties = {
     ...linkStyle,
-    borderBottomColor: '#2563eb',
-    color: '#1f2937'
+    color: '#1f2937',
+    borderBottom: '2px solid #2563eb'
   };
-
-  const buttonStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '0.5rem 1rem',
-    backgroundColor: 'transparent',
-    color: '#4b5563',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontWeight: '500',
+  
+  const userInfoStyle: CSSProperties = {
     fontSize: '0.875rem',
+    color: '#6b7280'
+  };
+  
+  const buttonStyle: CSSProperties = {
+    backgroundColor: 'transparent',
+    border: '1px solid #d1d5db',
+    color: '#4b5563',
+    padding: '0.5rem 1rem',
+    borderRadius: '0.375rem',
+    fontSize: '0.875rem',
+    fontWeight: '500',
     cursor: 'pointer',
     textDecoration: 'none'
   };
-
-  const primaryButtonStyle = {
+  
+  const primaryButtonStyle: CSSProperties = {
     ...buttonStyle,
     backgroundColor: '#2563eb',
     borderColor: '#2563eb',
     color: 'white'
   };
-
+  
   return (
     <nav style={navStyle}>
       <div style={containerStyle}>
-        <div style={navGroupStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <a href="/" style={logoStyle}>
             Trading Quiz
           </a>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <a href="/" style={window.location.pathname === '/' ? activeStyle : linkStyle}>
+          <div style={navLinksStyle}>
+            <a href="/" style={window.location.pathname === '/' ? activeLinkStyle : linkStyle}>
               Home
             </a>
             {isAuthenticated && (
               <>
-                <a href="/quiz" style={window.location.pathname === '/quiz' ? activeStyle : linkStyle}>
+                <a href="/quiz" style={window.location.pathname === '/quiz' ? activeLinkStyle : linkStyle}>
                   Quiz
                 </a>
-                <a href="/leaderboard" style={window.location.pathname === '/leaderboard' ? activeStyle : linkStyle}>
+                <a href="/leaderboard" style={window.location.pathname === '/leaderboard' ? activeLinkStyle : linkStyle}>
                   Leaderboard
                 </a>
               </>
             )}
           </div>
         </div>
-
-        <div style={navGroupStyle}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {isAuthenticated ? (
             <>
               {user && (
-                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                <div style={userInfoStyle}>
                   {user.username} | ELO: {user.eloScore}
                 </div>
               )}
-              <a href="/profile" style={window.location.pathname === '/profile' ? activeStyle : linkStyle}>
+              <a href="/profile" style={window.location.pathname === '/profile' ? activeLinkStyle : linkStyle}>
                 Profile
               </a>
               <button onClick={logout} style={buttonStyle}>

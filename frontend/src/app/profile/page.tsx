@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { useAuth } from '../context/AuthContext'
-import Link from 'next/link'
 
 interface UserProfile {
   id: string

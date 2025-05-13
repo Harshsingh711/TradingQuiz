@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../context/AuthContext';
@@ -46,20 +46,155 @@ export default function Login() {
     }
   };
 
+  // Inline styles
+  const pageContainerStyle: CSSProperties = {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f9fafb',
+    padding: '3rem 1rem'
+  };
+
+  const formCardStyle: CSSProperties = {
+    backgroundColor: 'white',
+    borderRadius: '0.75rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    padding: '2rem',
+    width: '100%',
+    maxWidth: '28rem',
+    border: '1px solid #f3f4f6'
+  };
+
+  const headerContainerStyle: CSSProperties = {
+    textAlign: 'center',
+    marginBottom: '2rem'
+  };
+
+  const titleStyle: CSSProperties = {
+    fontSize: '1.875rem',
+    fontWeight: '800',
+    color: '#1f2937',
+    marginBottom: '0.5rem'
+  };
+
+  const subtitleStyle: CSSProperties = {
+    fontSize: '1rem',
+    color: '#6b7280'
+  };
+
+  const errorContainerStyle: CSSProperties = {
+    backgroundColor: '#fee2e2',
+    border: '1px solid #f87171',
+    color: '#b91c1c',
+    padding: '0.75rem 1rem',
+    borderRadius: '0.5rem',
+    marginBottom: '1.5rem',
+    fontSize: '0.875rem'
+  };
+
+  const errorTitleStyle: CSSProperties = {
+    fontWeight: '600',
+    marginBottom: '0.25rem'
+  };
+
+  const formStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem'
+  };
+
+  const inputGroupStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column'
+  };
+
+  const labelStyle: CSSProperties = {
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '0.5rem'
+  };
+
+  const inputStyle: CSSProperties = {
+    padding: '0.75rem 1rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #d1d5db',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    fontSize: '1rem',
+    width: '100%',
+    color: '#1f2937',
+    transition: 'border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out',
+    outline: 'none'
+  };
+
+  const submitButtonStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    padding: '0.75rem 1rem',
+    backgroundColor: '#2563eb',
+    color: 'white',
+    borderRadius: '0.5rem',
+    border: 'none',
+    fontWeight: '600',
+    fontSize: '1rem',
+    cursor: loading ? 'not-allowed' : 'pointer',
+    transition: 'background-color 0.15s ease-in-out',
+    opacity: loading ? 0.7 : 1,
+    marginTop: '0.5rem'
+  };
+
+  const footerStyle: CSSProperties = {
+    textAlign: 'center',
+    marginTop: '2rem',
+    fontSize: '0.875rem',
+    color: '#6b7280'
+  };
+
+  const linkStyle: CSSProperties = {
+    color: '#2563eb',
+    fontWeight: '500',
+    textDecoration: 'none',
+    transition: 'color 0.15s ease-in-out'
+  };
+
+  const spinnerContainerStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center'
+  };
+
+  const spinnerStyle: CSSProperties = {
+    marginRight: '0.75rem',
+    width: '1.25rem',
+    height: '1.25rem',
+    borderRadius: '9999px',
+    borderTop: '2px solid transparent',
+    borderRight: '2px solid transparent',
+    borderBottom: '2px solid transparent',
+    borderLeft: '2px solid currentColor',
+    animation: 'spin 1s linear infinite'
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login to Trading Quiz</h2>
+    <div style={pageContainerStyle}>
+      <div style={formCardStyle}>
+        <div style={headerContainerStyle}>
+          <h2 style={titleStyle}>Welcome Back</h2>
+          <p style={subtitleStyle}>Sign in to continue to Trading Quiz</p>
+        </div>
         
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+          <div style={errorContainerStyle}>
+            <p style={errorTitleStyle}>Error:</p>
+            <p>{error}</p>
           </div>
         )}
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div style={inputGroupStyle}>
+            <label htmlFor="username" style={labelStyle}>
               Username
             </label>
             <input
@@ -67,13 +202,13 @@ export default function Login() {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              style={inputStyle}
               required
             />
           </div>
           
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+          <div style={inputGroupStyle}>
+            <label htmlFor="password" style={labelStyle}>
               Password
             </label>
             <input
@@ -81,27 +216,32 @@ export default function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              style={inputStyle}
               required
             />
           </div>
           
-          <div className="flex items-center justify-between">
+          <div>
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+              style={submitButtonStyle}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <span style={spinnerContainerStyle}>
+                  <span style={spinnerStyle}></span>
+                  Logging in...
+                </span>
+              ) : 'Sign In'}
             </button>
           </div>
         </form>
         
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
+        <div style={footerStyle}>
+          <p>
             Don&apos;t have an account?{' '}
-            <Link href="/auth/register" className="text-blue-500 hover:text-blue-700">
-              Register
+            <Link href="/auth/register" style={linkStyle}>
+              Create an account
             </Link>
           </p>
         </div>

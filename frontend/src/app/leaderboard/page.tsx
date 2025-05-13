@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, CSSProperties } from 'react'
 import axios from 'axios'
 
 interface LeaderboardEntry {
@@ -29,37 +29,188 @@ export default function Leaderboard() {
     fetchLeaderboard()
   }, [])
 
+  const pageContainerStyle: CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: '#f9fafb',
+    padding: '3rem 1rem'
+  }
+
+  const containerStyle: CSSProperties = {
+    maxWidth: '56rem',
+    margin: '0 auto',
+    padding: '0 1rem'
+  }
+
+  const cardStyle: CSSProperties = {
+    backgroundColor: 'white',
+    borderRadius: '0.5rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    overflow: 'hidden'
+  }
+
+  const loadingCardStyle: CSSProperties = {
+    ...cardStyle,
+    padding: '2rem',
+    textAlign: 'center' as const
+  }
+
+  const loadingSpinnerStyle: CSSProperties = {
+    height: '3rem',
+    width: '3rem',
+    borderRadius: '9999px',
+    borderBottom: '2px solid #2563eb',
+    animation: 'spin 1s linear infinite',
+    margin: '0 auto'
+  }
+
+  const loadingTextStyle: CSSProperties = {
+    marginTop: '1rem',
+    color: '#4b5563',
+    fontWeight: '500'
+  }
+
+  const headerStyle: CSSProperties = {
+    padding: '1rem 1.5rem',
+    borderBottom: '1px solid #e5e7eb',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  }
+
+  const titleStyle: CSSProperties = {
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+    color: '#111827'
+  }
+
+  const subtitleStyle: CSSProperties = {
+    fontSize: '0.875rem',
+    color: '#6b7280'
+  }
+
+  const emptyStateStyle: CSSProperties = {
+    padding: '2rem',
+    textAlign: 'center' as const,
+    color: '#6b7280'
+  }
+
+  const tableHeaderStyle: CSSProperties = {
+    padding: '0.75rem 1.5rem',
+    backgroundColor: '#f9fafb',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#6b7280'
+  }
+
+  const tableRowStyle = (index: number): CSSProperties => ({
+    padding: '1rem 1.5rem',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    alignItems: 'center',
+    borderBottom: '1px solid #f3f4f6',
+    backgroundColor: index < 3 ? '#eff6ff' : 'white'
+  })
+
+  const rankContainerStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center'
+  }
+
+  const topRankStyle = (position: number): CSSProperties => ({
+    width: '2rem',
+    height: '2rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '9999px',
+    color: 'white',
+    fontWeight: 'bold',
+    backgroundColor: position === 0 ? '#eab308' : position === 1 ? '#9ca3af' : '#b45309'
+  })
+
+  const regularRankStyle: CSSProperties = {
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    color: '#4b5563',
+    width: '2rem'
+  }
+
+  const usernameStyle: CSSProperties = {
+    fontWeight: '500',
+    color: '#111827'
+  }
+
+  const scoreStyle: CSSProperties = {
+    fontSize: '1.125rem',
+    fontWeight: '600',
+    color: '#2563eb',
+    textAlign: 'right' as const
+  }
+
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading leaderboard...</p>
+      <div style={pageContainerStyle}>
+        <div style={containerStyle}>
+          <div style={loadingCardStyle}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={loadingSpinnerStyle}></div>
+            </div>
+            <p style={loadingTextStyle}>Loading leaderboard...</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Leaderboard</h1>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {leaderboard.map((entry) => (
-            <div key={entry.id} className="px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <span className="text-lg font-semibold text-gray-900 w-8">
-                  #{entry.rank}
-                </span>
-                <span className="ml-4 text-gray-900">{entry.username}</span>
-              </div>
-              <span className="text-lg font-semibold text-primary-600">
-                {entry.eloScore}
-              </span>
+    <div style={pageContainerStyle}>
+      <div style={containerStyle}>
+        <div style={cardStyle}>
+          <div style={headerStyle}>
+            <h1 style={titleStyle}>Leaderboard</h1>
+            <p style={subtitleStyle}>Top traders ranked by ELO score</p>
+          </div>
+          
+          {leaderboard.length === 0 ? (
+            <div style={emptyStateStyle}>
+              No data available yet. Be the first to take a quiz!
             </div>
-          ))}
+          ) : (
+            <div>
+              {/* Header row */}
+              <div style={tableHeaderStyle}>
+                <div>Rank</div>
+                <div>Username</div>
+                <div style={{ textAlign: 'right' }}>ELO Score</div>
+              </div>
+              
+              {/* Leaderboard entries */}
+              {leaderboard.map((entry, index) => (
+                <div 
+                  key={entry.id} 
+                  style={tableRowStyle(index)}
+                >
+                  <div style={rankContainerStyle}>
+                    {index < 3 ? (
+                      <span style={topRankStyle(index)}>
+                        {entry.rank}
+                      </span>
+                    ) : (
+                      <span style={regularRankStyle}>
+                        #{entry.rank}
+                      </span>
+                    )}
+                  </div>
+                  <div style={usernameStyle}>{entry.username}</div>
+                  <div style={scoreStyle}>
+                    {entry.eloScore}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
