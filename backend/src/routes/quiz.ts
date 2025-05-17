@@ -4,6 +4,7 @@ import { Chart } from '../entities/Chart'
 import { Quiz } from '../entities/Quiz'
 import { User } from '../entities/User'
 import { authenticateToken } from '../middleware/auth'
+import axios from 'axios'
 
 const router = Router()
 
@@ -13,6 +14,45 @@ interface AuthRequest extends Request {
     userId: string
   }
 }
+
+// Get BTC historical data for the quiz
+router.get('/btc-history', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    // Get query parameters
+    const { days = '180' } = req.query;
+    const daysAgo = parseInt(days as string, 10);
+    
+    // Calculate time range
+    const endTime = Math.floor(Date.now() / 1000);
+    const startTime = endTime - (daysAgo * 24 * 60 * 60);
+    
+    // Fetch data from CoinGecko API
+    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range`, {
+      params: {
+        vs_currency: 'usd',
+        from: startTime,
+        to: endTime
+      }
+    });
+    
+    // Process and transform data
+    const priceData = response.data.prices.map((item: [number, number]) => {
+      return {
+        time: item[0] / 1000, // Convert from milliseconds to seconds
+        value: item[1] // Price in USD
+      };
+    });
+    
+    // Send the data
+    res.json({
+      symbol: 'BTCUSD',
+      data: priceData
+    });
+  } catch (error) {
+    console.error('Error fetching BTC data:', error);
+    res.status(500).json({ error: 'Error fetching BTC price data' });
+  }
+});
 
 // Get random chart for quiz
 router.get('/random', authenticateToken, async (req: AuthRequest, res: Response) => {

@@ -1,15 +1,47 @@
 'use client'
 
-import { useState, CSSProperties } from 'react'
+import { useState, CSSProperties, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import CandlestickChart from '../components/CandlestickChart'
 
 export default function Quiz() {
   const { isAuthenticated } = useAuth();
   const [decision, setDecision] = useState<'buy' | 'sell' | 'wait' | null>(null);
+  const [isChartReady, setIsChartReady] = useState(false);
+  const [isResultRevealed, setIsResultRevealed] = useState(false);
+  const [result, setResult] = useState<'up' | 'down' | null>(null);
 
   const handleDecision = (action: 'buy' | 'sell' | 'wait') => {
     setDecision(action);
     console.log(`User decided to ${action}`);
+    
+    // Reveal the chart after user makes a decision
+    if (typeof window !== 'undefined' && (window as any).__revealChart) {
+      const revealed = (window as any).__revealChart();
+      if (revealed) {
+        setIsResultRevealed(true);
+        
+        // For demonstration, randomly determine if they were right or wrong
+        // In a real implementation, this would compare with the actual future price
+        const randomResult = Math.random() > 0.5 ? 'up' : 'down';
+        setResult(randomResult);
+      }
+    }
+  };
+
+  const getResultMessage = () => {
+    if (!result) return '';
+    
+    if (
+      (decision === 'buy' && result === 'up') || 
+      (decision === 'sell' && result === 'down')
+    ) {
+      return 'Your prediction was correct! The price moved as you expected.';
+    } else if (decision === 'wait') {
+      return 'You decided to wait. No points gained or lost.';
+    } else {
+      return 'Your prediction was incorrect. The price moved against your expectation.';
+    }
   };
 
   // Styles
@@ -39,17 +71,9 @@ export default function Quiz() {
 
   const chartSectionStyle: CSSProperties = {
     flex: '2',
-    backgroundColor: '#f3f4f6',
     borderRadius: '0.375rem',
-    padding: '1rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '400px',
-    color: '#6b7280',
-    fontSize: '1rem',
-    fontWeight: '500',
-    border: '2px dashed #d1d5db'
+    overflow: 'hidden',
+    minHeight: '450px'
   };
 
   const actionSectionStyle: CSSProperties = {
@@ -171,14 +195,12 @@ export default function Quiz() {
       <h1 style={headingStyle}>Trading Quiz</h1>
       
       <div style={contentContainerStyle}>
-        {/* Left side - Chart placeholder (2/3 width) */}
+        {/* Left side - BTC Chart with Historical Point (2/3 width) */}
         <div style={chartSectionStyle}>
-          <div>
-            <p style={{ marginBottom: '0.5rem', textAlign: 'center' }}>Chart Placeholder</p>
-            <p style={{ fontSize: '0.875rem', opacity: 0.7, textAlign: 'center' }}>
-              The BTC/USD price chart will be displayed here
-            </p>
-          </div>
+          <CandlestickChart
+            height={450}
+            onReady={(ready) => setIsChartReady(ready)}
+          />
         </div>
         
         {/* Right side - Trading Actions (1/3 width) */}
@@ -186,28 +208,46 @@ export default function Quiz() {
           <div>
             <h2 style={actionTitleStyle}>What's your decision?</h2>
             <p style={actionDescriptionStyle}>
-              Based on the chart analysis, would you buy, sell, or wait?
+              Based on the historical BTC price shown, would you buy, sell, or wait?
+              {isChartReady ? 
+                " The chart shows price up to a specific point in time. Make your decision!" : 
+                " Loading chart data..."}
             </p>
           </div>
           
           <div style={buttonContainerStyle}>
             <button 
-              style={buyButtonStyle}
-              onClick={() => handleDecision('buy')}
+              style={{
+                ...buyButtonStyle,
+                opacity: decision || !isChartReady ? 0.7 : 1,
+                cursor: decision || !isChartReady ? 'not-allowed' : 'pointer'
+              }}
+              onClick={() => !decision && isChartReady && handleDecision('buy')}
+              disabled={!!decision || !isChartReady}
             >
               Buy
             </button>
             
             <button 
-              style={waitButtonStyle}
-              onClick={() => handleDecision('wait')}
+              style={{
+                ...waitButtonStyle,
+                opacity: decision || !isChartReady ? 0.7 : 1,
+                cursor: decision || !isChartReady ? 'not-allowed' : 'pointer'
+              }}
+              onClick={() => !decision && isChartReady && handleDecision('wait')}
+              disabled={!!decision || !isChartReady}
             >
               Wait
             </button>
             
             <button 
-              style={sellButtonStyle}
-              onClick={() => handleDecision('sell')}
+              style={{
+                ...sellButtonStyle,
+                opacity: decision || !isChartReady ? 0.7 : 1,
+                cursor: decision || !isChartReady ? 'not-allowed' : 'pointer'
+              }}
+              onClick={() => !decision && isChartReady && handleDecision('sell')}
+              disabled={!!decision || !isChartReady}
             >
               Sell
             </button>
@@ -216,7 +256,15 @@ export default function Quiz() {
           {decision && (
             <div style={resultStyle}>
               <p>You decided to <strong>{decision}</strong></p>
-              <p>This feature is currently for demonstration purposes only.</p>
+              
+              {!isResultRevealed ? (
+                <p>Revealing the price movement...</p>
+              ) : (
+                <>
+                  <p>The price went <strong>{result === 'up' ? 'UP ↑' : 'DOWN ↓'}</strong></p>
+                  <p style={{ marginTop: '10px' }}>{getResultMessage()}</p>
+                </>
+              )}
             </div>
           )}
         </div>
