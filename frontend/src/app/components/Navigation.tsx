@@ -2,9 +2,11 @@
 
 import { useAuth } from '../context/AuthContext';
 import { CSSProperties } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Navigation() {
   const { isAuthenticated, user, logout } = useAuth();
+  const pathname = usePathname();
   
   const navStyle: CSSProperties = {
     backgroundColor: 'white',
@@ -78,15 +80,18 @@ export default function Navigation() {
             Trading Quiz
           </a>
           <div style={navLinksStyle}>
-            <a href="/" style={window.location.pathname === '/' ? activeLinkStyle : linkStyle}>
+            <a href="/" style={pathname === '/' ? activeLinkStyle : linkStyle}>
               Home
             </a>
             {isAuthenticated && (
               <>
-                <a href="/quiz" style={window.location.pathname === '/quiz' ? activeLinkStyle : linkStyle}>
+                <a href="/quiz" style={pathname === '/quiz' ? activeLinkStyle : linkStyle}>
                   Quiz
                 </a>
-                <a href="/leaderboard" style={window.location.pathname === '/leaderboard' ? activeLinkStyle : linkStyle}>
+                <a href="/replay" style={pathname === '/replay' ? activeLinkStyle : linkStyle}>
+                  Replay
+                </a>
+                <a href="/leaderboard" style={pathname === '/leaderboard' ? activeLinkStyle : linkStyle}>
                   Leaderboard
                 </a>
               </>
@@ -102,7 +107,7 @@ export default function Navigation() {
                   {user.username} | ELO: {user.eloScore}
                 </div>
               )}
-              <a href="/profile" style={window.location.pathname === '/profile' ? activeLinkStyle : linkStyle}>
+              <a href="/profile" style={pathname === '/profile' ? activeLinkStyle : linkStyle}>
                 Profile
               </a>
               <button onClick={logout} style={buttonStyle}>
