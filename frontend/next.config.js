@@ -5,10 +5,13 @@ const nextConfig = {
     domains: ['localhost'],
   },
   async rewrites() {
+    // In production, use environment variable for API URL
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   },

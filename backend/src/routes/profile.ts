@@ -48,4 +48,57 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
   }
 })
 
+// Update user ELO score
+router.put('/elo', authenticateToken, async (req: AuthRequest, res: Response) => {
+  try {
+    console.log('ELO update request received:', {
+      userId: req.user?.userId,
+      requestBody: req.body,
+      headers: req.headers.authorization ? 'Bearer token present' : 'No auth header'
+    });
+    
+    const userRepository = AppDataSource.getRepository(User)
+    const userId = req.user?.userId
+    const { eloScore } = req.body
+
+    if (typeof eloScore !== 'number') {
+      console.error('Invalid ELO score type:', typeof eloScore, eloScore);
+      return res.status(400).json({ error: 'Invalid ELO score' })
+    }
+
+    const user = await userRepository.findOne({
+      where: { id: userId },
+    })
+
+    if (!user) {
+      console.error('User not found for ID:', userId);
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    console.log('Updating user ELO:', {
+      username: user.username,
+      oldElo: user.eloScore,
+      newElo: eloScore
+    });
+
+    // Update the user's ELO score
+    user.eloScore = eloScore
+    await userRepository.save(user)
+
+    console.log('ELO update successful:', {
+      username: user.username,
+      newElo: user.eloScore
+    });
+
+    res.json({
+      id: user.id,
+      username: user.username,
+      eloScore: user.eloScore,
+    })
+  } catch (error) {
+    console.error('Error updating ELO score:', error)
+    res.status(500).json({ error: 'Error updating ELO score' })
+  }
+})
+
 export default router 

@@ -14,18 +14,19 @@ export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const response = await axios.get('/api/leaderboard')
-        setLeaderboard(response.data)
-      } catch (error) {
-        console.error('Error fetching leaderboard:', error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchLeaderboard = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get('/api/leaderboard')
+      setLeaderboard(response.data)
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchLeaderboard()
   }, [])
 
@@ -149,6 +150,20 @@ export default function Leaderboard() {
     textAlign: 'right' as const
   }
 
+  const refreshButtonStyle: CSSProperties = {
+    backgroundColor: '#2563eb',
+    color: 'white',
+    border: 'none',
+    borderRadius: '0.375rem',
+    padding: '0.5rem 1rem',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  }
+
   if (loading) {
     return (
       <div style={pageContainerStyle}>
@@ -169,8 +184,21 @@ export default function Leaderboard() {
       <div style={containerStyle}>
         <div style={cardStyle}>
           <div style={headerStyle}>
-            <h1 style={titleStyle}>Leaderboard</h1>
-            <p style={subtitleStyle}>Top traders ranked by ELO score</p>
+            <div>
+              <h1 style={titleStyle}>Leaderboard</h1>
+              <p style={subtitleStyle}>Top traders ranked by ELO score</p>
+            </div>
+            <button 
+              onClick={fetchLeaderboard}
+              disabled={loading}
+              style={{
+                ...refreshButtonStyle,
+                opacity: loading ? 0.6 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {loading ? 'Refreshing...' : '🔄 Refresh'}
+            </button>
           </div>
           
           {leaderboard.length === 0 ? (

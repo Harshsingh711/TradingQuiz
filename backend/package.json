@@ -2,12 +2,13 @@
   "name": "trading-quiz-backend",
   "version": "1.0.0",
   "description": "Backend server for the Trading Quiz application",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
     "axios": "^1.9.0",

@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -10,7 +11,6 @@ import leaderboardRoutes from './routes/leaderboard'
 import profileRoutes from './routes/profile'
 import { User } from './entities/User'
 import { Quiz } from './entities/Quiz'
-import { Chart } from './entities/Chart'
 
 dotenv.config()
 
@@ -18,7 +18,7 @@ const app = express()
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }))
 app.use(helmet())
@@ -31,10 +31,12 @@ export const AppDataSource = new DataSource({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASSWORD || 'password',
   database: process.env.DB_NAME || 'trading_quiz',
-  entities: [User, Quiz, Chart],
-  synchronize: process.env.NODE_ENV === 'development',
+  synchronize: process.env.NODE_ENV !== 'production',
+  logging: process.env.NODE_ENV !== 'production',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  entities: [User, Quiz],
 })
 
 // Error handling middleware
@@ -53,6 +55,11 @@ AppDataSource.initialize()
   .then(() => {
     console.log('Database connected successfully')
     
+    // Health check endpoint
+    app.get('/health', (req, res) => {
+      res.json({ status: 'OK', timestamp: new Date().toISOString() })
+    })
+    
     // Register routes after database is initialized
     app.use('/api/auth', authRoutes)
     app.use('/api/quiz', quizRoutes)
@@ -60,9 +67,11 @@ AppDataSource.initialize()
     app.use('/api/profile', profileRoutes)
     
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`)
+      console.log(`Server running on port ${PORT}`)
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
     })
   })
   .catch((error) => {
-    console.error('Error connecting to database:', error)
+    console.error('Database connection failed:', error)
+    process.exit(1)
   }) 

@@ -16,6 +16,7 @@ interface AuthContextType {
   loading: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUserElo: (newElo: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   login: () => {},
   logout: () => {},
+  updateUserElo: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -58,6 +60,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('user', JSON.stringify(newUser));
   };
 
+  const updateUserElo = (newElo: number) => {
+    if (user) {
+      const updatedUser = { ...user, eloScore: newElo };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Also save to the separate ELO storage for backwards compatibility
+      localStorage.setItem('tradingQuizElo', newElo.toString());
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -75,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         login,
         logout,
+        updateUserElo,
       }}
     >
       {children}
