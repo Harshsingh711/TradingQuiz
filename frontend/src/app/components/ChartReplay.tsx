@@ -295,7 +295,7 @@ export default function ChartReplay({
   };
 
   // End quiz
-  const endQuiz = (reason: 'timeLimit' | 'candleLimit' | 'manual') => {
+  const endQuiz = async (reason: 'timeLimit' | 'candleLimit' | 'manual') => {
     if (!isQuizActive || !quizStartTime) return;
     
     const quizDuration = (Date.now() - quizStartTime) / 1000; // in seconds
@@ -308,7 +308,7 @@ export default function ChartReplay({
     const newElo = playerElo + eloChange;
     
     // Update ELO in auth context (this will update navigation and profile)
-    updateUserElo(newElo);
+    await updateUserElo(newElo);
     
     // Update ELO in database
     updateEloInDatabase(newElo);
@@ -344,7 +344,7 @@ export default function ChartReplay({
     const timer = setInterval(() => {
       setQuizTimeRemaining(prev => {
         if (prev <= 1) {
-          endQuiz('timeLimit');
+          endQuiz('timeLimit').catch(console.error);
           return 0;
         }
         return prev - 1;
@@ -357,7 +357,7 @@ export default function ChartReplay({
   // Check candle limit
   useEffect(() => {
     if (isQuizActive && candlePointsUsed >= 5000) {
-      endQuiz('candleLimit');
+      endQuiz('candleLimit').catch(console.error);
     }
   }, [candlePointsUsed, isQuizActive]);
 
@@ -1076,7 +1076,7 @@ export default function ChartReplay({
               </button>
             ) : (
               <button
-                onClick={() => endQuiz('manual')}
+                onClick={async () => await endQuiz('manual')}
                 style={{
                   padding: '6px 12px',
                   borderRadius: '4px',

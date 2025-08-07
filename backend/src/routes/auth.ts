@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { AppDataSource } from '../index'
@@ -7,7 +7,7 @@ import { User } from '../entities/User'
 const router = Router()
 
 // Register new user
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res): Promise<Response> => {
   try {
     const userRepository = AppDataSource.getRepository(User)
     const { username, password } = req.body
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
       { expiresIn: '24h' }
     )
 
-    res.status(201).json({
+    return res.status(201).json({
       token,
       user: {
         id: user.id,
@@ -47,12 +47,12 @@ router.post('/register', async (req, res) => {
     })
   } catch (error) {
     console.error('Registration error:', error)
-    res.status(500).json({ error: 'Error registering user' })
+    return res.status(500).json({ error: 'Error registering user' })
   }
 })
 
 // Login user
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res): Promise<Response> => {
   try {
     const userRepository = AppDataSource.getRepository(User)
     const { username, password } = req.body
@@ -76,7 +76,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     )
 
-    res.json({
+    return res.json({
       token,
       user: {
         id: user.id,
@@ -86,7 +86,7 @@ router.post('/login', async (req, res) => {
     })
   } catch (error) {
     console.error('Login error:', error)
-    res.status(500).json({ error: 'Error logging in' })
+    return res.status(500).json({ error: 'Error logging in' })
   }
 })
 

@@ -11,12 +11,13 @@ export const authenticateToken = (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
 
   if (!token) {
-    return res.status(401).json({ error: 'Authentication token required' })
+    res.status(401).json({ error: 'Authentication token required' })
+    return
   }
 
   try {
@@ -26,6 +27,7 @@ export const authenticateToken = (
     req.user = decoded
     next()
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid token' })
+    res.status(403).json({ error: 'Invalid token' })
+    return
   }
 } 

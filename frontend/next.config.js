@@ -15,6 +15,8 @@ const nextConfig = {
       },
     ]
   },
+  // Ensure dynamic rendering for pages that need it
+  trailingSlash: false,
 }
 
 module.exports = nextConfig 

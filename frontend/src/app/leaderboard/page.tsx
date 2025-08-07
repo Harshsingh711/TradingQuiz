@@ -17,7 +17,9 @@ export default function Leaderboard() {
   const fetchLeaderboard = async () => {
     setLoading(true)
     try {
+      console.log('Fetching leaderboard from API...')
       const response = await axios.get('/api/leaderboard')
+      console.log('Leaderboard response:', response.data)
       setLeaderboard(response.data)
     } catch (error) {
       console.error('Error fetching leaderboard:', error)
@@ -28,6 +30,30 @@ export default function Leaderboard() {
 
   useEffect(() => {
     fetchLeaderboard()
+    
+    // Set up automatic refresh every 10 seconds (more frequent)
+    const interval = setInterval(fetchLeaderboard, 10000)
+    
+    // Refresh when the page becomes visible (user returns from quiz)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchLeaderboard()
+      }
+    }
+    
+    // Refresh when the window gains focus (user switches back to tab)
+    const handleFocus = () => {
+      fetchLeaderboard()
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+    
+    return () => {
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [])
 
   const pageContainerStyle: CSSProperties = {

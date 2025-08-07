@@ -11,6 +11,7 @@ import leaderboardRoutes from './routes/leaderboard'
 import profileRoutes from './routes/profile'
 import { User } from './entities/User'
 import { Quiz } from './entities/Quiz'
+import { Chart } from './entities/Chart'
 
 dotenv.config()
 
@@ -36,11 +37,11 @@ export const AppDataSource = new DataSource({
   synchronize: process.env.NODE_ENV !== 'production',
   logging: process.env.NODE_ENV !== 'production',
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  entities: [User, Quiz],
+  entities: [User, Quiz, Chart],
 })
 
 // Error handling middleware
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack)
   res.status(500).json({
     error: 'Something went wrong!',
@@ -56,7 +57,7 @@ AppDataSource.initialize()
     console.log('Database connected successfully')
     
     // Health check endpoint
-    app.get('/health', (req, res) => {
+    app.get('/health', (_req, res) => {
       res.json({ status: 'OK', timestamp: new Date().toISOString() })
     })
     

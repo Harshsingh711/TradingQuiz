@@ -5,9 +5,11 @@ import { User } from '../entities/User'
 const router = Router()
 
 // Get leaderboard
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const userRepository = AppDataSource.getRepository(User)
+    
+    console.log('Fetching leaderboard data...')
     
     const users = await userRepository
       .createQueryBuilder('user')
@@ -16,6 +18,9 @@ router.get('/', async (req, res) => {
       .take(100)
       .getMany()
 
+    console.log(`Found ${users.length} users for leaderboard`)
+    console.log('Top 5 users:', users.slice(0, 5).map(u => ({ username: u.username, elo: u.eloScore })))
+
     const leaderboard = users.map((user, index) => ({
       id: user.id,
       username: user.username,
@@ -23,10 +28,10 @@ router.get('/', async (req, res) => {
       rank: index + 1,
     }))
 
-    res.json(leaderboard)
+    return res.json(leaderboard)
   } catch (error) {
     console.error('Error fetching leaderboard:', error)
-    res.status(500).json({ error: 'Error fetching leaderboard' })
+    return res.status(500).json({ error: 'Error fetching leaderboard' })
   }
 })
 

@@ -4,6 +4,9 @@ import { useState, CSSProperties, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import ChartReplay from '../components/ChartReplay'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function Quiz() {
   const { isAuthenticated, user, updateUserElo } = useAuth();
   const [chartHasData, setChartHasData] = useState(false);
@@ -75,14 +78,6 @@ export default function Quiz() {
     setTotalPnL(0);
     setTradeCount(0);
     setTradeHistory([]);
-  };
-
-  const resetElo = () => {
-    // Reset ELO through auth context
-    if (isAuthenticated && updateUserElo) {
-      updateUserElo(1200);
-      setCurrentElo(1200);
-    }
   };
 
   // Format time for display
@@ -374,7 +369,7 @@ export default function Quiz() {
               <li>Time limit: 10 minutes</li>
               <li>Candle limit: 5000 points</li>
               <li>1m = 1pt, 5m = 5pts, 15m = 15pts, 30m = 30pts, 1h = 60pts</li>
-              <li>Click "Start Quiz" to begin</li>
+              <li>Click &quot;Start Quiz&quot; to begin</li>
               <li>ELO changes based on % gain/loss</li>
             </ul>
           </div>
@@ -388,21 +383,6 @@ export default function Quiz() {
             }}>
               {currentElo}
             </div>
-            <button
-              onClick={resetElo}
-              style={{
-                marginTop: '0.5rem',
-                padding: '4px 8px',
-                fontSize: '0.75rem',
-                backgroundColor: '#FF5252',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Reset ELO
-            </button>
           </div>
           
           {/* Current Performance (during quiz) */}

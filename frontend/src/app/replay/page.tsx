@@ -4,6 +4,9 @@ import { useState, CSSProperties } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ChartReplay from '../components/ChartReplay';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default function ReplayPage() {
   const { isAuthenticated } = useAuth();
   const [tradeHistory, setTradeHistory] = useState<any[]>([]);

@@ -55,7 +55,7 @@ router.get('/btc-history', authenticateToken, async (req: AuthRequest, res: Resp
 });
 
 // Get random chart for quiz
-router.get('/random', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/random', authenticateToken, async (_req: AuthRequest, res: Response): Promise<Response> => {
   try {
     const chartRepository = AppDataSource.getRepository(Chart)
     
@@ -68,7 +68,7 @@ router.get('/random', authenticateToken, async (req: AuthRequest, res: Response)
       return res.status(404).json({ error: 'No charts available' })
     }
 
-    res.json({
+    return res.json({
       id: chart.id,
       chartImageUrl: chart.chartImageUrl,
       assetName: chart.assetName,
@@ -76,12 +76,12 @@ router.get('/random', authenticateToken, async (req: AuthRequest, res: Response)
     })
   } catch (error) {
     console.error('Error fetching random chart:', error)
-    res.status(500).json({ error: 'Error fetching chart' })
+    return res.status(500).json({ error: 'Error fetching chart' })
   }
 })
 
 // Submit quiz prediction
-router.post('/submit', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/submit', authenticateToken, async (req: AuthRequest, res: Response): Promise<Response> => {
   try {
     const chartRepository = AppDataSource.getRepository(Chart)
     const quizRepository = AppDataSource.getRepository(Quiz)
@@ -116,19 +116,19 @@ router.post('/submit', authenticateToken, async (req: AuthRequest, res: Response
     })
     await quizRepository.save(quiz)
 
-    res.json({
+    return res.json({
       correct: isCorrect,
       eloChange,
       newEloScore: user.eloScore,
     })
   } catch (error) {
     console.error('Error submitting quiz:', error)
-    res.status(500).json({ error: 'Error submitting quiz' })
+    return res.status(500).json({ error: 'Error submitting quiz' })
   }
 })
 
 // Helper function to calculate ELO change
-function calculateEloChange(currentElo: number, isCorrect: boolean): number {
+function calculateEloChange(_currentElo: number, isCorrect: boolean): number {
   const K = 32 // K-factor for ELO calculation
   const expectedScore = 0.5 // Expected score for a random prediction
   const actualScore = isCorrect ? 1 : 0

@@ -13,7 +13,7 @@ interface AuthRequest extends Request {
 }
 
 // Get user profile
-router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Promise<Response> => {
   try {
     const userRepository = AppDataSource.getRepository(User)
     const userId = req.user?.userId
@@ -33,7 +33,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
       .where('user.eloScore > :eloScore', { eloScore: user.eloScore })
       .getCount()
 
-    res.json({
+    return res.json({
       id: user.id,
       username: user.username,
       eloScore: user.eloScore,
@@ -44,12 +44,12 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
     })
   } catch (error) {
     console.error('Error fetching profile:', error)
-    res.status(500).json({ error: 'Error fetching profile' })
+    return res.status(500).json({ error: 'Error fetching profile' })
   }
 })
 
 // Update user ELO score
-router.put('/elo', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/elo', authenticateToken, async (req: AuthRequest, res: Response): Promise<Response> => {
   try {
     console.log('ELO update request received:', {
       userId: req.user?.userId,
@@ -90,14 +90,14 @@ router.put('/elo', authenticateToken, async (req: AuthRequest, res: Response) =>
       newElo: user.eloScore
     });
 
-    res.json({
+    return res.json({
       id: user.id,
       username: user.username,
       eloScore: user.eloScore,
     })
   } catch (error) {
     console.error('Error updating ELO score:', error)
-    res.status(500).json({ error: 'Error updating ELO score' })
+    return res.status(500).json({ error: 'Error updating ELO score' })
   }
 })
 
