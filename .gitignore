@@ -33,3 +33,13 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Deployment and Setup Files (Hidden from public)
+DEPLOYMENT.md
+SETUP_INSTRUCTIONS.md
+VERCEL_DEPLOYMENT.md
+setup_database.sh
+railway.json
+vercel.json
+backend/Procfile
+frontend/vercel.json
