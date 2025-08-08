@@ -27,18 +27,35 @@ app.use(morgan('dev'))
 app.use(express.json())
 
 // Database connection
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  database: process.env.DB_NAME || 'trading_quiz',
-  synchronize: process.env.NODE_ENV !== 'production',
-  logging: process.env.NODE_ENV !== 'production',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  entities: [User, Quiz, Chart],
-})
+let dbConfig: any;
+
+if (process.env.DATABASE_URL) {
+  // Heroku provides DATABASE_URL
+  dbConfig = {
+    type: 'postgres',
+    url: process.env.DATABASE_URL,
+    synchronize: process.env.NODE_ENV !== 'production',
+    logging: process.env.NODE_ENV !== 'production',
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    entities: [User, Quiz, Chart],
+  };
+} else {
+  // Local development with individual environment variables
+  dbConfig = {
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'password',
+    database: process.env.DB_NAME || 'trading_quiz',
+    synchronize: process.env.NODE_ENV !== 'production',
+    logging: process.env.NODE_ENV !== 'production',
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    entities: [User, Quiz, Chart],
+  };
+}
+
+export const AppDataSource = new DataSource(dbConfig);
 
 // Error handling middleware
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
