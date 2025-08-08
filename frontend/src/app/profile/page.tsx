@@ -29,7 +29,16 @@ export default function Profile() {
         });
         
         if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Backend server not found');
+          }
           throw new Error('Failed to fetch profile');
+        }
+        
+        // Check if response has JSON content
+        const contentType = response.headers.get('content-type');
+        if (!contentType?.includes('application/json')) {
+          throw new Error('Invalid response from server');
         }
         
         const data = await response.json();

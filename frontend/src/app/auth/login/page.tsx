@@ -27,11 +27,30 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
-
+      // Check if response is ok and has content
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to login');
+        if (response.status === 404) {
+          throw new Error('Backend server not found. Please check if the backend is running.');
+        }
+        
+        // Try to parse error response
+        let errorMessage = 'Failed to login';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      // Check if response has content
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        throw new Error('Invalid response from server');
+      }
+
+      const data = await response.json();
 
       // Use the auth context login function
       login(data.token, data.user);
@@ -40,6 +59,7 @@ export default function Login() {
       router.push('/profile');
       router.refresh();
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || 'An error occurred during login');
     } finally {
       setLoading(false);

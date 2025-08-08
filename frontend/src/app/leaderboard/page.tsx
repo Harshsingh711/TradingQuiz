@@ -18,11 +18,31 @@ export default function Leaderboard() {
     setLoading(true)
     try {
       console.log('Fetching leaderboard from API...')
-      const response = await axios.get('/api/leaderboard')
-      console.log('Leaderboard response:', response.data)
-      setLeaderboard(response.data)
+      
+      // Use fetch instead of axios for consistency
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/leaderboard`)
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Backend server not found')
+        }
+        throw new Error(`Failed to fetch leaderboard: ${response.status}`)
+      }
+      
+      // Check if response has JSON content
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        throw new Error('Invalid response from server');
+      }
+      
+      const data = await response.json()
+      console.log('Leaderboard response:', data)
+      setLeaderboard(data)
     } catch (error) {
       console.error('Error fetching leaderboard:', error)
+      // Set empty array on error to avoid crashes
+      setLeaderboard([])
     } finally {
       setLoading(false)
     }
