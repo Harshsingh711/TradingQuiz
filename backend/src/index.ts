@@ -34,7 +34,7 @@ if (process.env.DATABASE_URL) {
   dbConfig = {
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    synchronize: true, // Enable for initial table creation
+    synchronize: false, // Disable after initial table creation for security
     logging: process.env.NODE_ENV !== 'production',
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     entities: [User, Quiz, Chart],
