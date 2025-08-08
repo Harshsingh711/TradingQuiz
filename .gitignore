@@ -43,3 +43,6 @@ railway.json
 vercel.json
 backend/Procfile
 frontend/vercel.json
+
+# Vercel
+.vercel
